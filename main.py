@@ -107,7 +107,38 @@ Args:
 Returns:
     Compiled Keras model
 '''
+def overfitting_model(input):
+    # Create an overly complex model with many layers and neurons
+    # The model has excessive capacity for the small dataset (only 600 properties)
+    # Instead of learning general patterns, it will memorize individual training examples
+    # No regularization is used, allowing the model to fit noise in the data
+    model = tf.keras.models.Sequential([
+        # Very large first layer with excessive capacity (1024 neurons)
+        # This gives the model enough parameters to memorize training examples
+        tf.keras.layers.Dense(1024, activation='relu', input_shape=(input,)),
+        # Many hidden layers with decreasing size but still too complex for small dataset
+        # The depth allows the model to create overly specific representations
+        tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(32, activation='relu'),
+        tf.keras.layers.Dense(16, activation='relu'),
+        # Output layer: earlier layers give the final layer enough power to memorize the training data
+        tf.keras.layers.Dense(1)
+    ])
 
+    # Compile with standard learning rate and very small batch size to encourage overfitting
+    # Batch size of 4 means the model sees very few examples per update, making it unstable
+    # Excessive capacity and instability leads to memorization of noise
+    # No regularization or dropout is applied, allowing the model to overfit completely
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        loss='mae',
+        metrics=['mae']
+    )
+
+    return model
 
 '''
 Create a well-balanced model (generalize)
