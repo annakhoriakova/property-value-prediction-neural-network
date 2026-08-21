@@ -185,3 +185,39 @@ def optimized_model(input):
     )
 
     return model
+
+'''
+Train and evaluate a model with the given configuration
+Args:
+    model: Compiled Keras model
+    x_train, y_train: Training data
+    x_test, y_test: Testing data
+    epochs: Number of training epochs
+    batch_size: Batch size for training
+    model_name: Name for display purposes
+Returns:
+    training_history: Training history object
+    test_mae: Final test MAE
+'''
+def train_and_evaluate(model, x_train, y_train, x_test, y_test, epochs, batch_size, model_name):
+    print(f"\n{'='*60}")
+    print(f"Training {model_name}")
+    print(f"{'='*60}")
+
+    # Display model architecture
+    model.summary()
+
+    # Train the model
+    history = model.fit(
+        x_train, y_train,
+        epochs=epochs,
+        batch_size=batch_size,
+        validation_data=(x_test, y_test),
+        verbose=1
+    )
+
+    # Evaluate on test set
+    test_loss, test_mae = model.evaluate(x_test, y_test, verbose=0)
+    print(f"\n{model_name} Test MAE: ${test_mae:,.2f}")
+
+    return history, test_mae
