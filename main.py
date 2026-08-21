@@ -147,3 +147,41 @@ Args:
 Returns:
     Compiled Keras model
 '''
+def optimized_model(input):
+    # Create neural network model
+    model = tf.keras.models.Sequential([
+        # 512 neurons in this layer, use relu activation, l2 regularization, and pass how many input features to expect (input) 
+        # l2 regularizer will prevent overfitting without being too aggressive (soften extreme values, prevent the model
+        # from memorizing random coincidences in the data)
+        tf.keras.layers.Dense(512, activation = 'relu',
+                              kernel_regularizer = tf.keras.regularizers.l2(0.001), 
+                              input_shape = (input,)),
+        # Randomly drop 40% of neurons during training, force network to not rely on any single neuron
+        tf.keras.layers.Dropout(0.4), 
+
+        # Second hidden layer with regularization
+        tf.keras.layers.Dense(256, activation = 'relu',
+                              kernel_regularizer = tf.keras.regularizers.l2(0.001)),
+        # Randomly drop 30% of neurons during training 
+        # (30% instead of 40% because it's working with patterns already discovered by the first layer)
+        tf.keras.layers.Dropout(0.3), 
+
+        # Hidden layers without regularization
+        tf.keras.layers.Dense(128, activation = 'relu'),
+        tf.keras.layers.Dropout(0.2), # Randomly drop 20% of neurons during training 
+
+        tf.keras.layers.Dense(64, activation = 'relu'),
+        tf.keras.layers.Dense(32, activation = 'relu'),
+
+        # Only 1 neuron in output layer (single price prediction for regression)
+        tf.keras.layers.Dense(1)
+    ])
+
+    # Compile the model with Adam optimizer and MAE loss
+    model.compile (
+        optimizer = tf.keras.optimizers.Adam(learning_rate = 0.0002), # Lower learning rate
+        loss = 'mae', # Measures average dollar difference between predictions and actual values
+        metrics = ['mae'] # Track progress during training (how accurate the model actually is)
+    )
+
+    return model
