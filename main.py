@@ -68,3 +68,51 @@ def preprocess_data(df):
     x_test = (x_test - train_mean) / train_std
 
     return x_train, x_test, y_train, y_test
+
+'''
+Create a model designed to underfit the data
+Args: 
+    input: The number of input features
+Returns:
+    Compiled Keras model
+'''
+def underfitting_model(input):
+    # Create a simple neural network with minimal capacity
+    # The model is too simple to capture the complex relationships in the data
+    model = tf.keras.models.Sequential([
+        # Only 2 neurons in the hidden layer (too few to learn complex patterns)
+        # With only 2 neurons, the model can only learn very basic patterns like "bigger houses cost more"
+        # It cannot capture how location, year of construction, and property type combine to affect value
+        # No regularization is applied to keep the model as simple as possible
+        tf.keras.layers.Dense(2, activation='relu', input_shape=(input,)),
+        # Single neuron output layer for regression (predicts one value: the property price)
+        tf.keras.layers.Dense(1)
+    ])
+
+    # Compile with standard learning rate
+    # Using MAE (Mean Absolute Error) as the loss function
+    # MAE measures the average dollar difference between predictions and actual values
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        loss='mae',
+        metrics=['mae']
+    )
+
+    return model
+
+'''
+Create a model designed to overfit the data
+Args: 
+    input: The number of input features
+Returns:
+    Compiled Keras model
+'''
+
+
+'''
+Create a well-balanced model (generalize)
+Args: 
+    input: The number of input features
+Returns:
+    Compiled Keras model
+'''
