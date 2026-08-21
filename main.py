@@ -221,3 +221,79 @@ def train_and_evaluate(model, x_train, y_train, x_test, y_test, epochs, batch_si
     print(f"\n{model_name} Test MAE: ${test_mae:,.2f}")
 
     return history, test_mae
+
+'''
+Main function to load data, train all three models, and display results
+'''
+def main():
+    # Fix seed for reproducibility
+    np.random.seed(2025)
+    tf.random.set_seed(2025)
+
+    # Load the dataset (600 samples)
+    df = pd.read_csv('yyc_dataset.csv')
+
+    # Preprocess the data
+    x_train, x_test, y_train, y_test = preprocess_data(df)
+
+    print(f"Dataset loaded: {len(df)} samples")
+    print(f"Training samples: {x_train.shape[0]}")
+    print(f"Testing samples: {x_test.shape[0]}")
+    print(f"Number of features: {x_train.shape[1]}")
+
+    # ================================
+    # Model 1: Underfitting
+    # ================================
+    print("\n" + "="*60)
+    print("MODEL 1: UNDERFITTING")
+    print("="*60)
+
+    # Create underfitting model
+    model_under = underfitting_model(x_train.shape[1])
+    history_under, test_mae_under = train_and_evaluate(
+        model_under, x_train, y_train, x_test, y_test,
+        epochs=100, batch_size=32, model_name="Underfitting Model"
+    )
+
+    # ================================
+    # Model 2: Overfitting
+    # ================================
+    print("\n" + "="*60)
+    print("MODEL 2: OVERFITTING")
+    print("="*60)
+
+    # Create overfitting model
+    model_over = overfitting_model(x_train.shape[1])
+    history_over, test_mae_over = train_and_evaluate(
+        model_over, x_train, y_train, x_test, y_test,
+        epochs=300, batch_size=4, model_name="Overfitting Model"
+    )
+
+    # ================================
+    # Model 3: Optimized
+    # ================================
+    print("\n" + "="*60)
+    print("MODEL 3: OPTIMIZED")
+    print("="*60)
+
+    # Create optimized model
+    model_opt = optimized_model(x_train.shape[1])
+    history_opt, test_mae_opt = train_and_evaluate(
+        model_opt, x_train, y_train, x_test, y_test,
+        epochs=200, batch_size=128, model_name="Optimized Model"
+    )
+
+    # ================================
+    # Summary of Results
+    # ================================
+    print("\n" + "="*60)
+    print("FINAL RESULTS SUMMARY")
+    print("="*60)
+    print(f"Underfitting Model Test MAE: ${test_mae_under:,.2f}")
+    print(f"Overfitting Model Test MAE:  ${test_mae_over:,.2f}")
+    print(f"Optimized Model Test MAE:    ${test_mae_opt:,.2f}")
+    print("="*60)
+
+if __name__ == "__main__":
+    main()
+    
